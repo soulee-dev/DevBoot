@@ -61,7 +61,7 @@ services:
     image: grafana/grafana:latest
     env_file: .env
     ports:
-      - "4000:4000"
+      - "4000:3000"
     volumes:
       - grafana-data:/var/lib/grafana
     restart: always
