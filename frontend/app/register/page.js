@@ -4,6 +4,7 @@ import { useRouter } from "next/navigation";
 import { useEffect } from "react";
 import axios from "axios";
 import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 import process from "next/dist/build/webpack/loaders/resolve-url-loader/lib/postcss";
 import zxcvbn from "zxcvbn";
 
