@@ -23,11 +23,12 @@ WORKDIR /home/${USER}
 # Install MySQL
 COPY setup.sh .
 RUN chmod +x setup.sh
-RUN sudo ./setup.sh
 
 # Install Python MySQL Replication
 RUN git clone https://github.com/julien-duponchelle/python-mysql-replication \
 	&& cd python-mysql-replication \
 	&& python3 -m venv venv \
 	&& . venv/bin/activate \
-	&& pip install .
+	&& pip install . \
+	&& pip install packaging \
+	&& pip install pytest
