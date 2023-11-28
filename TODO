@@ -1,7 +1,6 @@
 # TODO
 
-- [ ] Coder 배포
-  - [ ] python:3.11, venv, mysql
-- [ ] FE, BE, grafana 배포
+- [ ] grafana 배포
+- [ ] portainer 테스트
 - [ ] 기여자 문서 작성하기
 - [ ] 관리자 문서 작성하기
