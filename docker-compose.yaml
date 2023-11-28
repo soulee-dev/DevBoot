@@ -2,12 +2,9 @@ version: "3.9"
 services:
   coder:
     image: ghcr.io/coder/coder:${CODER_VERSION:-latest}
+    env_file: .env
     ports:
       - "7080:7080"
-    environment:
-      CODER_PG_CONNECTION_URL: "postgresql://${POSTGRES_USER:-username}:${POSTGRES_PASSWORD:-password}@database/${POSTGRES_DB:-coder}?sslmode=disable"
-      CODER_HTTP_ADDRESS: "0.0.0.0:7080"
-      CODER_ACCESS_URL: "${CODER_ACCESS_URL}"
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
     depends_on:
@@ -15,12 +12,9 @@ services:
         condition: service_healthy
   database:
     image: "postgres:14.2"
+    env_file: .env
     ports:
       - "5432:5432"
-    environment:
-      POSTGRES_USER: ${POSTGRES_USER:-username}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-password}
-      POSTGRES_DB: ${POSTGRES_DB:-coder}
     volumes:
       - coder_data:/var/lib/postgresql/data
     healthcheck:
@@ -32,6 +26,7 @@ services:
       interval: 5s
       timeout: 5s
       retries: 5
+
   backend:
     build: ./backend
     env_file: .env
@@ -52,6 +47,7 @@ services:
 
   portainer:
     image: portainer/portainer-ce:latest
+    env_file: .env
     container_name: portainer
     restart: always
     ports:
@@ -61,6 +57,16 @@ services:
       - /var/run/docker.sock:/var/run/docker.sock
       - portainer_data:/data
 
+  grafana:
+    image: grafana/grafana:latest
+    env_file: .env
+    ports:
+      - "3000:3000"
+    volumes:
+      - grafana-data:/var/lib/grafana
+    restart: always
+
 volumes:
   coder_data:
   portainer_data:
+  grafana-data:
