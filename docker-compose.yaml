@@ -35,16 +35,32 @@ services:
   backend:
     build: ./backend
     env_file: .env
+    depends_on:
+      database:
+        condition: service_healthy
     ports:
       - "8080:8080"
 
   frontend:
     build: ./frontend
+    env_file: .env
     environment:
       - NODE_ENV=production
     ports:
       - "3000:3000"
     command: npm start
 
+  portainer:
+    image: portainer/portainer-ce:latest
+    container_name: portainer
+    restart: always
+    ports:
+      - "8000:8000"
+      - "9443:9443"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - portainer_data:/data
+
 volumes:
   coder_data:
+  portainer_data:
