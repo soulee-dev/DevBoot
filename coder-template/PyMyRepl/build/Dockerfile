@@ -30,5 +30,6 @@ RUN git clone https://github.com/julien-duponchelle/python-mysql-replication \
 	&& python3 -m venv venv \
 	&& . venv/bin/activate \
 	&& pip install . \
+	$$ pip install mysql-replication \
 	&& pip install packaging \
 	&& pip install pytest
