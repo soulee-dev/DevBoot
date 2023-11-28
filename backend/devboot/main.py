@@ -36,6 +36,12 @@ app.add_middleware(
 )
 
 
+def send_discord_webhook(message: str):
+    data = {"content": message}
+    response = requests.post(os.getenv("DISCORD_WEBHOOK_URL"), json=data)
+    response.raise_for_status()  
+
+
 def get_db():
     db = SessionLocal()
     try:
@@ -87,6 +93,8 @@ async def startup_event():
     code_data = schemas.CodeIn(code=random_code)
     crud.create_code(db=SessionLocal(), code=code_data)
 
+    send_discord_webhook(f"New code generated: {random_code}")
+
 
 @app.post("/token", response_model=schemas.Token)
 async def login_for_access_token(
@@ -131,4 +139,6 @@ async def register(user: schemas.User, valid_jwt: bool = Depends(is_jwt_valid)):
 
     res = requests.post(f"{os.getenv('CODER_API_URL')}/api/v2/users", headers=headers, data=json_data)
 
+    if res.status_code == 201:
+        send_discord_webhook(f"New user registered: {user.username}({user.email})")
     return Response(content=res.text, status_code=res.status_code, media_type="application/json")
