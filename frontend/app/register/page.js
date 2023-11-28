@@ -5,6 +5,7 @@ import { useEffect } from "react";
 import axios from "axios";
 import { ToastContainer, toast } from "react-toastify";
 import process from "next/dist/build/webpack/loaders/resolve-url-loader/lib/postcss";
+import zxcvbn from "zxcvbn";
 
 const RegisterPage = () => {
   const router = useRouter();
@@ -19,32 +20,46 @@ const RegisterPage = () => {
 
     // if name is not alphanumeric, return
     if (!name.match(/^[0-9a-zA-Z]+$/)) {
-        toast.error("닉네임은 영문, 숫자만 가능합니다.");
-        return ;
+      toast.error("닉네임은 영문, 숫자만 가능합니다.");
+      return;
     }
 
     if (password !== confirmPassword) {
-        toast.error("비밀번호가 일치하지 않습니다.");
-        return ;
+      toast.error("비밀번호가 일치하지 않습니다.");
+      return;
+    }
+
+    if (password.length > 64) {
+      toast.error("비밀번호는 64자 이하로 입력해주세요.");
+      return;
+    }
+
+    const passwordScore = zxcvbn(password).score;
+    if (passwordScore < 3) {
+      toast.error("더 강력한 비밀번호를 입력해주세요.");
+      return;
     }
 
     const data = {
-        username: name,
-        email,
-        password,
-    }
+      username: name,
+      email,
+      password,
+    };
 
-    axios.post(`${process.env.NEXT_PUBLIC_API_URL}/register`, data, {
-      headers: {
-        "Authorization": `Bearer ${localStorage.getItem("token")}`,
-      }
-    }).then((res) => {
+    axios
+      .post(`${process.env.NEXT_PUBLIC_API_URL}/register`, data, {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
+      })
+      .then((res) => {
         console.log(res);
         toast.success("회원가입에 성공했습니다.");
-    }).catch((err) => {
+      })
+      .catch((err) => {
         console.log(err);
         toast.error("회원가입에 실패했습니다.");
-        });
+      });
   };
 
   useEffect(() => {
