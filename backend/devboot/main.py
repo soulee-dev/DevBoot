@@ -1,3 +1,4 @@
+import json
 import os
 from dotenv import load_dotenv
 from fastapi import Depends, FastAPI, HTTPException, status
@@ -5,11 +6,15 @@ from sqlalchemy.orm import Session
 import string
 import random
 from datetime import datetime, timedelta
-from jose import jwt
 from . import crud, models, schemas
 from .database import SessionLocal, engine
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.security import OAuth2PasswordBearer
+from pydantic import BaseModel
+import requests
+from jose import jwt
+from fastapi import Response
+
 
 load_dotenv()
 
@@ -56,24 +61,18 @@ def create_access_token(data: dict, expires_delta: timedelta | None = None):
     encoded_jwt = jwt.encode(to_encode, os.getenv("SECRET_KEY"), algorithm=ALGORITHM)
     return encoded_jwt
 
-async def get_current_user(token: Annotated[str, Depends(oauth2_scheme)]):
-    credentials_exception = HTTPException(
-        status_code=status.HTTP_401_UNAUTHORIZED,
-        detail="Could not validate credentials",
-        headers={"WWW-Authenticate": "Bearer"},
-    )
+class TokenData(BaseModel):
+    email: str | None = None
+
+async def is_jwt_valid(token: str = Depends(oauth2_scheme)):
     try:
-        payload = jwt.decode(token, os.getenv("SECRET_KEY"), algorithms=[ALGORITHM])
-        username: str = payload.get("sub")
-        if username is None:
-            raise credentials_exception
-        token_data = TokenData(username=username)
-    except JWTError:
-        raise credentials_exception
-    user = get_user(fake_users_db, username=token_data.username)
-    if user is None:
-        raise credentials_exception
-    return user
+        jwt.decode(token, os.getenv("SECRET_KEY"), algorithms=[ALGORITHM])
+        return True
+    except jwt.ExpiredSignatureError:
+        # Handle expired token
+        return False
+    except jwt.JWTError:
+        return False
 
 
 def generate_random_code(length=6):
@@ -106,3 +105,30 @@ async def login_for_access_token(
     )
     return {"access_token": access_token, "token_type": "bearer"}
 
+@app.post("/register")
+async def register(user: schemas.User, valid_jwt: bool = Depends(is_jwt_valid)):
+    if not valid_jwt:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Invalid JWT",
+            headers={"WWW-Authenticate": "Bearer"},
+
+        )
+    headers = {
+        "Content-Type": "application/json",
+        "Accept": "application/json",
+        "Coder-Session-Token": f"{os.getenv('CODER_TOKEN')}"
+    }
+
+    data = {
+        "email": user.email,
+        "username": user.username,
+        "password": user.password
+    }
+
+    json_data = json.dumps(data)
+
+
+    res = requests.post(f"{os.getenv('CODER_API_URL')}/api/v2/users", headers=headers, data=json_data)
+
+    return Response(content=res.text, status_code=res.status_code, media_type="application/json")
