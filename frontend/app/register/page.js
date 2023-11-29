@@ -59,7 +59,12 @@ const RegisterPage = () => {
       })
       .catch((err) => {
         console.log(err);
-        toast.error("회원가입에 실패했습니다.");
+        toast.error(
+          <>
+            <p>회원가입에 실패했습니다.</p>
+            <p>{err.response.data.message}</p>
+          </>
+        );
       });
   };
 

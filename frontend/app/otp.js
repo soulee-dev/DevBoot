@@ -131,6 +131,7 @@ const OTPPage = () => {
           <>
             <p>인증에 실패했습니다.</p>
             <p>다시 시도해주세요.</p>
+            <p>{error.response.data.message}</p>
           </>
         );
       });
