@@ -2,6 +2,17 @@
 
 DevBoot enable users eaily setup dev enviornments during Sprint
 
+## Pre-Installation
+
+### Generate Portianer password
+
+```
+sudo apt install apache2-utils
+
+htpasswd -nbB admin {Your password} | cut -d ":" -f 2 | sed 's/\$/\$\$/g'
+
+```
+
 ## Installation
 
 Based on Ubuntu 22.04 LTS
@@ -62,4 +73,7 @@ NEXT_PUBLIC_API_URL=
 # Grafana
 GF_SECURITY_ADMIN_USER=
 GF_SECURITY_ADMIN_PASSWORD=
+
+# Portainer
+PORTAINER_CREDENTAIL=
 ```
