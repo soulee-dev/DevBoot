@@ -79,11 +79,13 @@ services:
       - ./prometheus.yml:/etc/prometheus/prometheus.yml
     ports:
       - "9090:9090"
+    restart: always
 
   node-exporter:
     image: prom/node-exporter
     ports:
       - "9100:9100"
+    restart: always
 
 volumes:
   coder_data:

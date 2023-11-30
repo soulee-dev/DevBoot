@@ -8,6 +8,6 @@ scrape_configs:
   - job_name: "node"
     static_configs:
       - targets: ["node-exporter:9100"]
-  - job_name: "node"
+  - job_name: "coder"
     static_configs:
       - targets: ["coder:2112"]
