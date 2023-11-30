@@ -10,6 +10,7 @@ services:
     depends_on:
       database:
         condition: service_healthy
+    restart: always
 
   database:
     image: "postgres:14.2"
@@ -27,6 +28,7 @@ services:
       interval: 5s
       timeout: 5s
       retries: 5
+    restart: always
 
   backend:
     build: ./backend
@@ -36,6 +38,7 @@ services:
         condition: service_healthy
     ports:
       - "8080:8080"
+    restart: always
 
   frontend:
     build: ./frontend
@@ -45,6 +48,7 @@ services:
     ports:
       - "3000:3000"
     command: npm start
+    restart: always
 
   portainer:
     image: portainer/portainer-ce:latest
