@@ -73,6 +73,18 @@ services:
       - grafana-data:/var/lib/grafana
     restart: always
 
+  prometheus:
+    image: prom/prometheus
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml
+    ports:
+      - "9090:9090"
+
+  node-exporter:
+    image: prom/node-exporter
+    ports:
+      - "9100:9100"
+
 volumes:
   coder_data:
   portainer_data:
